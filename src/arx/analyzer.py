@@ -59,7 +59,7 @@ Provide a JSON response with:
             client = openai.OpenAI(api_key=self.openai_api_key)
             
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-5-mini",
                 messages=[
                     {"role": "system", "content": "You are a security expert analyzing PKGBUILD files for malicious intent."},
                     {"role": "user", "content": prompt}
