@@ -64,7 +64,6 @@ Provide a JSON response with:
                     {"role": "system", "content": "You are a security expert analyzing PKGBUILD files for malicious intent."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.1
             )
             
             analysis_text = response.choices[0].message.content
