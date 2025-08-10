@@ -15,6 +15,7 @@ urls = { Homepage = "https://github.com/PhilCauss/arx" }
 
 [project.scripts]
 arx = "arx.cli:main"
+arx-config = "arx.config_cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

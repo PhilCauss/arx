@@ -103,7 +103,9 @@ Arx performs several types of security analysis:
 - **40-69**: 🟡 Medium risk - Review carefully
 - **70-100**: 🟢 Low risk - Generally safe
 
-## Output Example
+## Output Examples
+
+### Verbose Output (default)
 
 ```
 Packages to install: firefox
@@ -111,29 +113,94 @@ Packages to install: firefox
 Analyzing firefox...
 
 ============================================================
-SECURITY ANALYSIS REPORT: firefox
+SECURITY ANALYSIS: firefox
 ============================================================
-Security Score: 🟢 85/100
-✅ No malicious intent detected
+📦 PACKAGE NAME ANALYSIS:
+  ✅ Package name appears normal
 
-📦 Package Name Analysis:
-  Package name appears normal
+🔍 PKGBUILD SECURITY ANALYSIS:
+  Malicious Intent: ✅ NO
+  Confidence: 0.85
 
-💡 Recommendations:
-  • Package appears safe for installation
+  Suspicious Patterns:
+    • None detected
+
+  Recommendations:
+    • Package appears safe for installation
+
+  Analysis:
+    This PKGBUILD follows standard packaging practices...
 ============================================================
 
 ============================================================
 OVERALL SECURITY ASSESSMENT
 ============================================================
-Overall Security Score: 85/100
+Average Confidence: 0.85
+✅  No malicious intent detected in any packages
 ============================================================
 
 Do you want to continue with the installation? (y/N): y
 Proceeding with installation...
 ```
 
+### Non-Verbose Output
+
+```
+Analyzing 1 packages...
+
+========================================
+CHECK: firefox
+========================================
+📦 NAME: ✅ Normal
+🔍 PKGBUILD: ✅ SAFE (Confidence: 0.85)
+========================================
+
+========================================
+OVERALL ASSESSMENT
+========================================
+✅  All packages appear safe
+========================================
+
+Do you want to continue with the installation? (y/N): y
+```
+
 ## Configuration
+
+### Configuration File
+
+Arx uses a configuration file (`config.ini`) to control its behavior. The configuration file is automatically created in the following locations (in order of priority):
+
+1. **Current working directory**: `./config.ini`
+2. **User config directory**: `~/.config/arx/config.ini`
+3. **System config directory**: `/etc/arx/config.ini`
+
+#### Configuration Options
+
+```ini
+[arx]
+# Control the verbosity of arx output
+# If verbose=true: Display full detailed analysis output (default)
+# If verbose=false: Display only check name and PKGBUILD analysis results
+verbose = true
+```
+
+#### Managing Configuration
+
+Use the `arx-config` command to manage your configuration:
+
+```bash
+# Show current configuration
+arx-config show
+
+# Enable verbose mode
+arx-config verbose true
+
+# Disable verbose mode
+arx-config verbose false
+
+# Show configuration file path
+arx-config path
+```
 
 ### Environment Variables
 
