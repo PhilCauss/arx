@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arx"
-version = "1.0.0"
+version = "1.0.1"
 description = "A secure wrapper around yay package manager"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -14,7 +14,13 @@ dependencies = [
 ]
 authors = [{ name = "Arx Developer" }]
 license = { text = "MIT" }
-urls = { Homepage = "https://github.com/yourusername/arx" }
+urls = { Homepage = "https://github.com/PhilCauss/arx" }
 
 [project.scripts]
 arx = "arx.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
