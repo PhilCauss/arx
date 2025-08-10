@@ -23,21 +23,33 @@ class ArxSecurityAnalyzer:
         """Analyze PKGBUILD for malicious intent using OpenAI"""
         if not self.openai_api_key:
             return SecurityAnalysis(
-                score=50,
                 malicious_intent=False,
+                confidence=0.5,
                 suspicious_patterns=["No OpenAI API key provided"],
                 recommendations=["Set OPENAI_API_KEY environment variable for detailed analysis"],
-                package_name_analysis="Analysis not available"
+                analysis="Analysis not available"
             )
         
         try:
             prompt = f"""
-Analyze this PKGBUILD for potential malicious intent. Look for:
+Analyze the following PKGBUILD for potential malicious intent.
+
+Important:
+- Many legitimate packages download sources or run build scripts from upstream.
+- Do NOT consider expected upstream build processes (e.g., running ./configure, ./mach, make, cmake, meson, patching source files) as malicious if they are consistent with normal packaging practices.
+- Only mark "malicious_intent" as true if the PKGBUILD performs actions that are clearly unnecessary or harmful for building the software, such as:
+    • Installing backdoors or miners
+    • Exfiltrating data
+    • Modifying unrelated system files
+    • Contacting suspicious or unrelated domains
+    • Setting insecure file permissions that create vulnerabilities
+
+Look for:
 1. Suspicious commands in prepare(), build(), or install() functions
-2. Unusual network requests or downloads
-3. File system modifications outside of package directory
-4. Execution of downloaded scripts
-5. Hardcoded URLs or IP addresses
+2. Unusual network requests or downloads outside of normal source retrieval
+3. File system modifications outside of the packaging directory ($pkgdir or $srcdir)
+4. Execution of downloaded scripts from untrusted sources
+5. Hardcoded API keys, credentials, URLs, or IP addresses unrelated to source hosting
 6. Unusual permissions or file operations
 
 Package name: {package_name}
@@ -45,13 +57,13 @@ Package name: {package_name}
 PKGBUILD content:
 {pkgbuild_content}
 
-Provide a JSON response with:
+Return a JSON object with the following keys:
 {{
-    "score": <0-100>,
-    "malicious_intent": <true/false>,
-    "suspicious_patterns": ["pattern1", "pattern2"],
-    "recommendations": ["rec1", "rec2"],
-    "analysis": "detailed explanation"
+  "malicious_intent": <true|false>,                 // Only true if evidence clearly points to malicious activity
+  "confidence": <0.0–1.0>,                           // Confidence in the correctness of the malicious_intent value (1.0 = fully certain, 0.0 = no confidence)
+  "suspicious_patterns": ["pattern1", "pattern2"],  // Short descriptions of detected issues
+  "recommendations": ["rec1", "rec2"],              // Steps to verify or mitigate
+  "analysis": "Detailed explanation including why legitimate actions are not considered malicious"
 }}
 """
             
@@ -59,11 +71,12 @@ Provide a JSON response with:
             client = openai.OpenAI(api_key=self.openai_api_key)
             
             response = client.chat.completions.create(
-                model="gpt-5-mini",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are a security expert analyzing PKGBUILD files for malicious intent."},
                     {"role": "user", "content": prompt}
                 ],
+                temperature=0.1
             )
             
             analysis_text = response.choices[0].message.content
@@ -72,28 +85,28 @@ Provide a JSON response with:
             if json_match:
                 analysis_data = json.loads(json_match.group())
                 return SecurityAnalysis(
-                    score=analysis_data.get('score', 50),
                     malicious_intent=analysis_data.get('malicious_intent', False),
+                    confidence=analysis_data.get('confidence', 0.5),
                     suspicious_patterns=analysis_data.get('suspicious_patterns', []),
                     recommendations=analysis_data.get('recommendations', []),
-                    package_name_analysis=analysis_data.get('analysis', '')
+                    analysis=analysis_data.get('analysis', '')
                 )
             else:
                 return SecurityAnalysis(
-                    score=50,
                     malicious_intent=False,
+                    confidence=0.5,
                     suspicious_patterns=["Could not parse AI analysis"],
                     recommendations=["Manual review recommended"],
-                    package_name_analysis=analysis_text
+                    analysis=analysis_text
                 )
                 
         except Exception as e:
             return SecurityAnalysis(
-                score=50,
                 malicious_intent=False,
+                confidence=0.5,
                 suspicious_patterns=[f"Analysis failed: {str(e)}"],
                 recommendations=["Manual review recommended"],
-                package_name_analysis="Analysis failed"
+                analysis="Analysis failed"
             )
     
     def analyze_package_name(self, package_name: str) -> str:

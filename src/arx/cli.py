@@ -8,27 +8,39 @@ from .analyzer import ArxSecurityAnalyzer
 from .wrapper import YayWrapper
 
 
-def display_security_report(package_name: str, analysis):
+def display_security_report(package_name: str, analysis, analyzer):
     """Display security analysis report for a package"""
     print(f"\n{'='*60}")
     print(f"SECURITY ANALYSIS: {package_name}")
     print(f"{'='*60}")
-    print(f"Security Score: {analysis.score}/100")
-    print(f"Malicious Intent: {'⚠️  YES' if analysis.malicious_intent else '✅ NO'}")
+    
+    # Start with package name analysis
+    print("📦 PACKAGE NAME ANALYSIS:")
+    name_analysis = analyzer.analyze_package_name(package_name)
+    if name_analysis and name_analysis != "Package name appears normal":
+        print(f"  ⚠️  {name_analysis}")
+    else:
+        print(f"  ✅ Package name appears normal")
+    
+    # Then show PKGBUILD analysis results
+    print(f"\n🔍 PKGBUILD SECURITY ANALYSIS:")
+    print(f"  Malicious Intent: {'⚠️  YES' if analysis.malicious_intent else '✅ NO'}")
+    print(f"  Confidence: {analysis.confidence:.2f}")
+
     
     if analysis.suspicious_patterns:
-        print(f"\nSuspicious Patterns:")
+        print(f"\n  Suspicious Patterns:")
         for pattern in analysis.suspicious_patterns:
-            print(f"  • {pattern}")
+            print(f"    • {pattern}")
     
     if analysis.recommendations:
-        print(f"\nRecommendations:")
+        print(f"\n  Recommendations:")
         for rec in analysis.recommendations:
-            print(f"  • {rec}")
+            print(f"    • {rec}")
     
-    if analysis.package_name_analysis:
-        print(f"\nPackage Name Analysis:")
-        print(f"  {analysis.package_name_analysis}")
+    if analysis.analysis:
+        print(f"\n  Analysis:")
+        print(f"    {analysis.analysis}")
     
     print(f"{'='*60}")
 
@@ -106,17 +118,16 @@ def main():
                 packages_not_found.append(package)
                 continue
             
-            # Analyze PKGBUILD
-            analysis = analyzer.analyze_pkgbuild(pkgbuild_content, package)
-            
-            # Analyze package name
+            # First, analyze package name for typosquatting and suspicious naming
             name_analysis = analyzer.analyze_package_name(package)
-            analysis.package_name_analysis = name_analysis
+            
+            # Then analyze PKGBUILD content
+            analysis = analyzer.analyze_pkgbuild(pkgbuild_content, package)
             
             all_analyses.append((package, analysis))
             
             # Display report
-            display_security_report(package, analysis)
+            display_security_report(package, analysis, analyzer)
         
         # Handle packages that were not found
         if packages_not_found:
@@ -137,17 +148,19 @@ def main():
                 print("Installation cancelled by user.")
                 return 1
         
-        # Calculate overall security score
+        # Calculate overall security assessment
         if all_analyses:
-            overall_score = sum(analysis.score for _, analysis in all_analyses) // len(all_analyses)
             overall_malicious = any(analysis.malicious_intent for _, analysis in all_analyses)
+            overall_confidence = sum(analysis.confidence for _, analysis in all_analyses) / len(all_analyses)
             
             print(f"\n{'='*60}")
             print(f"OVERALL SECURITY ASSESSMENT")
             print(f"{'='*60}")
-            print(f"Overall Security Score: {overall_score}/100")
+            print(f"Average Confidence: {overall_confidence:.2f}")
             if overall_malicious:
                 print("⚠️  MALICIOUS INTENT DETECTED IN ONE OR MORE PACKAGES!")
+            else:
+                print("✅  No malicious intent detected in any packages")
             print(f"{'='*60}\n")
         
         # Prompt for continuation
