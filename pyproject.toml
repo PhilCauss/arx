@@ -4,16 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arx"
-version = "1.0.1"
-description = "A secure wrapper around yay package manager"
+version = "1.0.2"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
   "openai>=1.0.0",
   "requests>=2.25.0",
 ]
-authors = [{ name = "Arx Developer" }]
-license = { text = "MIT" }
 urls = { Homepage = "https://github.com/PhilCauss/arx" }
 
 [project.scripts]
