@@ -6,10 +6,11 @@ Arx is a Python script that wraps around the `yay` package manager for Arch Linu
 
 - 🔍 **PKGBUILD Analysis**: Uses OpenAI to analyze PKGBUILD files for malicious intent
 - 🛡️ **Package Name Analysis**: Detects potential typosquatting and suspicious naming patterns
-- 📊 **Security Scoring**: Provides a 0-100 security score for each package
+- 📊 **Confidence Scoring**: Provides confidence levels for security analysis results
 - ⚠️ **Malicious Intent Detection**: Identifies potentially harmful packages
 - 🎯 **Yay Compatibility**: Accepts all yay arguments and passes them through
 - 🔄 **Interactive Prompts**: Asks for confirmation before proceeding with installation
+- ⚙️ **Configuration Management**: Easy configuration via config.ini file and arx-config command
 
 ## Installation
 
@@ -24,12 +25,12 @@ Arx is a Python script that wraps around the `yay` package manager for Arch Linu
    pip install -r requirements.txt
    ```
 
-3. **Make the script executable**:
+3. **Install the package**:
    ```bash
-   chmod +x arx.py
+   pip install -e .
    ```
 
-4. **Set up OpenAI API key** (optional but recommended):
+4. **Set up OpenAI API key** (required for PKGBUILD analysis):
    ```bash
    export OPENAI_API_KEY="your-openai-api-key-here"
    ```
@@ -50,35 +51,35 @@ Arx works as a drop-in replacement for yay. All yay arguments are supported:
 
 ```bash
 # Install a package
-./arx.py -S firefox
+arx -S firefox
 
 # Install multiple packages
-./arx.py -S firefox vlc gimp
+arx -S firefox vlc gimp
 
 # Update system
-./arx.py -Syu
+arx -Syu
 
 # Search for packages
-./arx.py -Ss firefox
+arx -Ss firefox
 
 # Remove packages
-./arx.py -R firefox
+arx -R firefox
 ```
 
 ### Examples
 
 ```bash
 # Install a package with security analysis
-./arx.py -S spotify
+arx -S spotify
 
 # Update all packages
-./arx.py -Syu
+arx -Syu
 
 # Install from AUR
-./arx.py -S yay-git
+arx -S yay-git
 
 # Remove packages
-./arx.py -Rns firefox
+arx -Rns firefox
 ```
 
 ## Security Analysis
@@ -98,10 +99,10 @@ Arx performs several types of security analysis:
 - Checks for very short or very long package names
 - Warns about packages with excessive numbers or characters
 
-### 3. Security Scoring
-- **0-39**: 🔴 High risk - Exercise extreme caution
-- **40-69**: 🟡 Medium risk - Review carefully
-- **70-100**: 🟢 Low risk - Generally safe
+### 3. Confidence Levels
+- **High Confidence (0.8-1.0)**: 🟢 Strong analysis results, package appears safe
+- **Medium Confidence (0.6-0.79)**: 🟡 Moderate analysis results, review recommended
+- **Low Confidence (0.0-0.59)**: 🔴 Limited analysis results, exercise caution
 
 ## Output Examples
 
@@ -204,7 +205,7 @@ arx-config path
 
 ### Environment Variables
 
-- `OPENAI_API_KEY`: Your OpenAI API key for PKGBUILD analysis
+- `OPENAI_API_KEY`: Your OpenAI API key for PKGBUILD analysis (required)
 - `ARX_TEMP_DIR`: Custom temporary directory for PKGBUILD analysis (optional)
 - `ARX_DEBUG`: Set to `1` for debug output
 
@@ -212,7 +213,7 @@ arx-config path
 
 You can modify the script to:
 - Add more suspicious patterns for package names
-- Customize the security scoring algorithm
+- Customize the confidence scoring algorithm
 - Add additional analysis methods
 - Modify the prompt for OpenAI analysis
 
@@ -235,10 +236,10 @@ unset ARX_TEMP_DIR
 
 ## Dependencies
 
-- Python 3.7+
+- Python 3.8+
 - `yay` package manager
-- `openai` Python package
-- `requests` Python package
+- `openai>=1.0.0` Python package
+- `requests>=2.25.0` Python package
 
 ## Troubleshooting
 
@@ -254,7 +255,7 @@ unset ARX_TEMP_DIR
    - Verify your OpenAI account is active
 
 3. **Permission denied**:
-   - Make the script executable: `chmod +x arx.py`
+   - Make sure the script is properly installed: `pip install -e .`
    - Run with proper permissions
 
 4. **Package not found**:
@@ -266,7 +267,7 @@ unset ARX_TEMP_DIR
 Enable debug mode by setting the environment variable:
 ```bash
 export ARX_DEBUG=1
-./arx.py -S firefox
+arx -S firefox
 ```
 
 ## Contributing
