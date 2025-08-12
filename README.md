@@ -206,7 +206,6 @@ arx-config path
 ### Environment Variables
 
 - `OPENAI_API_KEY`: Your OpenAI API key for PKGBUILD analysis (required)
-- `ARX_TEMP_DIR`: Custom temporary directory for PKGBUILD analysis (optional)
 - `ARX_DEBUG`: Set to `1` for debug output
 
 ### Customization
@@ -217,22 +216,14 @@ You can modify the script to:
 - Add additional analysis methods
 - Modify the prompt for OpenAI analysis
 
-### Temporary Directory Configuration
+### Temporary Directory Handling
 
-By default, arx creates temporary directories in the system's temp location (`$TMPDIR` or `/tmp`) for PKGBUILD analysis. You can customize this behavior:
+Arx automatically creates temporary directories in the system's temp location (`$TMPDIR` or `/tmp`) for PKGBUILD analysis. This approach ensures:
 
-```bash
-# Use a custom temp directory (files will be preserved for inspection)
-export ARX_TEMP_DIR="/home/user/arx_temp"
-
-# Use system temp directory (files will be automatically cleaned up)
-unset ARX_TEMP_DIR
-```
-
-**Note**: 
-- **System temp**: Creates `/tmp/arx/arx_<package_name>/` directories and cleans them up after analysis
-- **Custom temp**: Creates `/your/path/arx_<package_name>/` directories and cleans them up after analysis
-- The `$TMPDIR` environment variable is respected if set, otherwise defaults to `/tmp`
+- **Automatic cleanup**: Temporary files are automatically removed after analysis
+- **System integration**: Respects the `$TMPDIR` environment variable if set, otherwise defaults to `/tmp`
+- **Isolation**: Creates `/tmp/arx/arx_<package_name>/` directories for each package analysis
+- **Security**: No persistent temporary files that could accumulate over time
 
 ## Dependencies
 

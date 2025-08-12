@@ -14,7 +14,7 @@ class YayWrapper:
     
     def __init__(self, temp_dir: Optional[str] = None):
         self.yay_path = self._find_yay()
-        self.temp_dir = temp_dir or os.getenv('ARX_TEMP_DIR')
+        self.temp_dir = temp_dir
     
     def _find_yay(self) -> str:
         """Find yay executable"""
@@ -57,7 +57,7 @@ class YayWrapper:
         try:
             # Create temporary directory for arx
             if self.temp_dir:
-                # Use custom temp directory
+                # Use provided temp directory (if passed as parameter)
                 temp_dir = os.path.join(self.temp_dir, f"arx_{package_name}")
                 os.makedirs(temp_dir, exist_ok=True)
             else:
@@ -108,12 +108,11 @@ class YayWrapper:
             # Clean up temporary directory
             if temp_dir and os.path.exists(temp_dir):
                 if self.temp_dir:
-                    # For custom temp dir, just clean up the package subdirectory
+                    # For provided temp dir, clean up the package subdirectory
                     try:
                         shutil.rmtree(temp_dir)
-                        print(f"Cleaned up temporary directory: {temp_dir}")
                     except Exception as e:
-                        print(f"Warning: Could not clean up temporary directory {temp_dir}: {e}")
+                        pass
                 else:
                     # For system temp dir, clean up the package subdirectory
                     try:
@@ -123,8 +122,8 @@ class YayWrapper:
                         if os.path.exists(arx_base) and not os.listdir(arx_base):
                             os.rmdir(arx_base)
                     except Exception as e:
-                        print(f"Warning: Could not clean up temporary directory {temp_dir}: {e}")
-    
+                        pass
+                    
     def check_package_exists(self, package_name: str) -> bool:
         """Check if a package exists in AUR or official repositories"""
         try:

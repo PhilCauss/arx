@@ -3,7 +3,7 @@ arx - A secure wrapper around yay package manager
 Analyzes packages for malicious intent before installation
 """
 
-__version__ = "1.0.8"
+__version__ = "1.0.9"
 __author__ = "Arx Developer"
 
 from .analyzer import ArxSecurityAnalyzer

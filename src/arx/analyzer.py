@@ -15,7 +15,7 @@ class ArxSecurityAnalyzer:
     
     def __init__(self, openai_api_key: Optional[str] = None, temp_dir: Optional[str] = None):
         self.openai_api_key = openai_api_key or os.getenv('OPENAI_API_KEY')
-        self.temp_dir = temp_dir or os.getenv('ARX_TEMP_DIR')
+        self.temp_dir = temp_dir
         if self.openai_api_key:
             openai.api_key = self.openai_api_key
     

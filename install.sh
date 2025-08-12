@@ -85,11 +85,10 @@ if [ -z "$OPENAI_API_KEY" ]; then
     echo ""
 fi
 
-# Optional: Set custom temp directory
+# Note about temporary directory handling
 echo ""
-echo "💡 Optional: Set custom temporary directory for PKGBUILD analysis:"
-echo "  export ARX_TEMP_DIR='/path/to/your/temp/dir'"
-echo "  echo 'export ARX_TEMP_DIR=\"/path/to/your/temp/dir\"' >> ~/.bashrc"
+echo "💡 Note: Arx automatically uses system temporary directories for PKGBUILD analysis."
+echo "   Temporary files are created in /tmp/arx/ and automatically cleaned up after use."
 echo ""
 
 echo ""
